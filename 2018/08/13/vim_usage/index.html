@@ -108,20 +108,24 @@
 
 
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Youmy">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="vim的几种模式 正常模式 插入模式 命令模式 可视模式  模式的切换 其它三种模式-&amp;gt;正常模式：按&amp;lt;ESC&amp;gt;，一次不行就两次 正常模式-&amp;gt;插入模式：按i，有一些键能够执行一定的功能并进入插入模式，这里暂不展开 正常模式-&amp;gt;命令模式：按: 正常模式-&amp;gt;可视模式：按v  增删查改编辑文本或代码命令行下1$ vim hello.cpp 将会启动vim，此时vim处">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vim的基本操作">
+<meta property="og:url" content="http://yoursite.com/2018/08/13/vim_usage/index.html">
 <meta property="og:site_name" content="Youmy">
+<meta property="og:description" content="vim的几种模式 正常模式 插入模式 命令模式 可视模式  模式的切换 其它三种模式-&amp;gt;正常模式：按&amp;lt;ESC&amp;gt;，一次不行就两次 正常模式-&amp;gt;插入模式：按i，有一些键能够执行一定的功能并进入插入模式，这里暂不展开 正常模式-&amp;gt;命令模式：按: 正常模式-&amp;gt;可视模式：按v  增删查改编辑文本或代码命令行下1$ vim hello.cpp 将会启动vim，此时vim处">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-08-13T02:06:44.774Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Youmy">
+<meta name="twitter:title" content="vim的基本操作">
+<meta name="twitter:description" content="vim的几种模式 正常模式 插入模式 命令模式 可视模式  模式的切换 其它三种模式-&amp;gt;正常模式：按&amp;lt;ESC&amp;gt;，一次不行就两次 正常模式-&amp;gt;插入模式：按i，有一些键能够执行一定的功能并进入插入模式，这里暂不展开 正常模式-&amp;gt;命令模式：按: 正常模式-&amp;gt;可视模式：按v  增删查改编辑文本或代码命令行下1$ vim hello.cpp 将会启动vim，此时vim处">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/08/13/vim_usage/"/>
 
 
 
@@ -131,7 +135,7 @@
   };
 </script>
 
-  <title>Youmy</title>
+  <title>vim的基本操作 | Youmy</title>
   
 
 
@@ -178,8 +182,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -216,7 +219,7 @@
         
         
           
-          <li class="menu-item menu-item-home menu-item-active">
+          <li class="menu-item menu-item-home">
     <a href="/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
   </li>
@@ -260,9 +263,9 @@
           
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -294,11 +297,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/08/13/vim_usage/" itemprop="url">
-                  vim的基本操作
-                </a>
+          <h1 class="post-title" itemprop="name headline">vim的基本操作
               
             
           </h1>
@@ -357,9 +356,7 @@
       
 
       
-        
-          
-            <!-- Vim是绕不过去的一门技能。很多公司都是PC+服务器的开发模式，命令行下的编辑器 -->
+        <!-- Vim是绕不过去的一门技能。很多公司都是PC+服务器的开发模式，命令行下的编辑器 -->
 <h3 id="vim的几种模式"><a href="#vim的几种模式" class="headerlink" title="vim的几种模式"></a>vim的几种模式</h3><ul>
 <li>正常模式</li>
 <li>插入模式</li>
@@ -382,8 +379,6 @@
 <p>首先是基本的光标移动：方向键或<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">h               # 前</span><br><span class="line">j               # 下</span><br><span class="line">k               # 上</span><br><span class="line">l               # 后</span><br><span class="line"># 高级点的</span><br><span class="line">3h              # 向前移动三个字符，类推</span><br><span class="line">o               # 移动到行首；&lt;Home&gt;&lt;End&gt;键也可以</span><br><span class="line">gg              # 移动到文件开头；&lt;ctrl+Home&gt;</span><br><span class="line">G               # 移动到文件最后一行；&lt;ctrl+End&gt;</span><br><span class="line">&lt;n&gt;G            # 跳到指定行，&lt;n&gt;表示行号，如3G表示跳到第三行</span><br><span class="line">:&lt;n&gt;            # 同上跳到某一行，是使用命令模式的方法</span><br><span class="line"># 定位各种括号，如(),[],&#123;&#125;；当光标在括号上时，按下`%`光标将跳到另一半括号上</span><br><span class="line">%</span><br><span class="line">################</span><br><span class="line"># 查找内容，如下，按n查找下一个，N查找上一个</span><br><span class="line">/&lt;word&gt;         # 向后查找</span><br><span class="line">?&lt;word&gt;         # 向前查找</span><br><span class="line"># 替换，替换就有点麻烦了</span><br><span class="line">:%s/&lt;old&gt;/&lt;new&gt;/gc      # 替换前询问</span><br><span class="line"># 一个例子</span><br><span class="line">:5,13s/&lt;old&gt;/&lt;new&gt;/g    # 替换第5-13行之间的关键词</span><br></pre></td></tr></table></figure></p>
 <h3 id="改"><a href="#改" class="headerlink" title="改"></a>改</h3><p>这里介绍复制、粘贴等操作<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 复制</span><br><span class="line">yy              # 复制当前行</span><br><span class="line"><span class="number">3</span>yy             # 复制<span class="number">3</span>行</span><br><span class="line"><span class="keyword">y</span>$              # 复制从光标到行尾所有字符</span><br><span class="line">yG              # 复制当前行到文件结尾</span><br><span class="line"># 粘贴</span><br><span class="line"><span class="keyword">p</span>               # 粘贴到光标之后</span><br><span class="line"><span class="keyword">P</span>               # 粘贴到光标之前</span><br></pre></td></tr></table></figure></p>
 
-          
-        
       
     </div>
 
@@ -403,12 +398,12 @@
       
 
       
+      
+      
 
       
 
       
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -418,14 +413,15 @@
   </article>
 
 
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -446,8 +442,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -492,6 +497,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#vim的几种模式"><span class="nav-number">1.</span> <span class="nav-text">vim的几种模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模式的切换"><span class="nav-number">2.</span> <span class="nav-text">模式的切换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增删查改"><span class="nav-number"></span> <span class="nav-text">增删查改</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑文本或代码"><span class="nav-number">1.</span> <span class="nav-text">编辑文本或代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快速删除"><span class="nav-number">2.</span> <span class="nav-text">快速删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#撤销和恢复"><span class="nav-number">3.</span> <span class="nav-text">撤销和恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查"><span class="nav-number">4.</span> <span class="nav-text">查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#改"><span class="nav-number">5.</span> <span class="nav-text">改</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -622,6 +643,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.0"></script>
+
+
 
   
 
