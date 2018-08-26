@@ -339,12 +339,24 @@
                 
               
 
-              <time title="Created: 2018-08-25 00:00:00 / Modified: 13:24:23" itemprop="dateCreated datePublished" datetime="2018-08-25T00:00:00+00:00">2018-08-25</time>
+              <time title="Created: 2018-08-25 00:00:00" itemprop="dateCreated datePublished" datetime="2018-08-25T00:00:00+00:00">2018-08-25</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-08-26 09:16:58" itemprop="dateModified" datetime="2018-08-26T09:16:58+00:00">2018-08-26</time>
               
             
           </span>
@@ -396,22 +408,14 @@
 
       
         
-          
-            <p>Keras提供了一套很方便的在线读取、处理数据集的方法。对于Image Classification只要按照一定的结构组织图像数据集就能使用<code>ImageDataGenerator</code>这个类来在线读取训练、验证集数据，再配合<code>fit_generator</code>能够很方便的完成模型的训练和验证。</p>
-<p>最近，在学习Action Recognition，本质上也是一个分类问题，但是输入数据不再是单张图片，而是一段图像序列；Keras本身的数据生成器无法满足要求，于是便想自己写一个，但又想利用一下keras本身十分丰富的各种data augmentation函数，看了下其源码，一点体会记录如下。</p>
-<p>首先，<code>ImageDataGenerator</code>这个类并没有什么实质性的功能，仅仅接受了一些参数，然后传递给了其他类使用<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构造函数接受一些data augmentation的参数</span></span><br><span class="line">__init__()</span><br><span class="line"><span class="comment"># 读取numpy data</span></span><br><span class="line">flow()</span><br><span class="line"><span class="comment"># 从硬盘读取数据，进行data augmentation，然后生成需要的batch</span></span><br><span class="line"><span class="comment"># 这个函数的实现是调用了另一个迭代器DirectoryIterator</span></span><br><span class="line">flow_from_directory()</span><br><span class="line"><span class="comment"># 以下这三个函数类本身没用到，竟然给别的类调用。。。</span></span><br><span class="line">standardize()</span><br><span class="line">random_transform()</span><br><span class="line">fit()</span><br></pre></td></tr></table></figure></p>
-<p>然后重点来了，<code>DirectoryIterator</code>这个类继承了另一个类<code>Iterator</code>；接下来重点分析下这个<code>Iterator</code>类<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 当然这个类也继承了其他类，由于这个类本身已经很简单了直接分析</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Iterator</span><span class="params">(Sequence)</span>:</span></span><br><span class="line">  <span class="comment"># 首先需要提供四个参数</span></span><br><span class="line">  <span class="comment"># n: 数据集总的样本数，后面三个不用说了吧</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, n, batch_size, shuffle, seed)</span>:</span></span><br><span class="line">  <span class="comment"># 这个函数用来给每个样本编个号(0, n-1)</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_set_index_array</span><span class="params">(self)</span>:</span></span><br><span class="line">  <span class="comment"># 简而言之，就是提供a[i]这种功能</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, idx)</span>:</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> self._get_batches_of_transformed_samples(index_array)</span><br><span class="line">  <span class="comment"># 计算有多少个batch，会多算一个保证所有数据都能参与训练或验证</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__len__</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> (self.n + self.batch_size - <span class="number">1</span>) // self.batch_size  </span><br><span class="line">  <span class="comment"># 没看到这个接口被使用，callback也有同名接口</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">on_epoch_end</span><span class="params">(self)</span>:</span></span><br><span class="line">    self._set_index_array()</span><br><span class="line">  <span class="comment"># 重置batch_index</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">reset</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.batch_index = <span class="number">0</span></span><br><span class="line">  <span class="comment"># 这个函数实现了生成器，生成一个batch的索引</span></span><br><span class="line">  <span class="comment"># 从实现上看，无法整除时，多余的部分会被丢弃</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_flow_index</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="comment"># Ensure self.batch_index is 0.</span></span><br><span class="line">    self.reset()</span><br><span class="line">    <span class="keyword">while</span> <span class="number">1</span>:</span><br><span class="line">      <span class="keyword">if</span> self.seed <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        np.random.seed(self.seed + self.total_batches_seen)</span><br><span class="line">      <span class="keyword">if</span> self.batch_index == <span class="number">0</span>:</span><br><span class="line">        self._set_index_array()</span><br><span class="line"></span><br><span class="line">      current_index = (self.batch_index * self.batch_size) % self.n</span><br><span class="line">      <span class="keyword">if</span> self.n &gt; current_index + self.batch_size:</span><br><span class="line">        self.batch_index += <span class="number">1</span></span><br><span class="line">      <span class="keyword">else</span>:</span><br><span class="line">        self.batch_index = <span class="number">0</span></span><br><span class="line">      self.total_batches_seen += <span class="number">1</span></span><br><span class="line">      <span class="keyword">yield</span> self.index_array[current_index:current_index + self.batch_size]</span><br><span class="line">  <span class="comment"># 迭代器必须提供的方法</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self</span><br><span class="line">  <span class="comment"># 迭代器必须提供的方法，这个接口是核心，子类需要实现该功能</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__next__</span><span class="params">(self, *args, **kwargs)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> self.next(*args, **kwargs)</span><br><span class="line">  <span class="comment"># 需要子类实现的重要接口，根据batch index读取数据，并做变换生成batch</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_get_batches_of_transformed_samples</span><span class="params">(self, index_array)</span>:</span></span><br><span class="line">    <span class="keyword">raise</span> NotImplementedError</span><br></pre></td></tr></table></figure></p>
-<p>上述的<code>iterator</code>类是没法直接使用的，需要继承该类，然后实现<code>__next__</code>和<code>_get_batches_of_transformed_samples</code>两个方法，下面看看<code>DirectoryIterator</code>类是如何继承并实现接口的</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DirectoryIterator</span><span class="params">(Iterator)</span>:</span></span><br><span class="line">  <span class="comment"># 构造函数可以增添很多参数，完成你要的功能，但是别忘了调用一下父类的构造函数</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, ...)</span>:</span></span><br><span class="line">    ... ...</span><br><span class="line">    super(DirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 获取batch，自由度很大也是你要实现各种data generator重点要改的地方</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">_get_batches_of_transformed_samples</span><span class="params">(self, index_array)</span>:</span></span><br><span class="line">    ... ...</span><br><span class="line">    <span class="keyword">return</span> batch_x, batch_y</span><br><span class="line">  <span class="comment"># next方法可以看到主要完成了两步，生成batch index和get batch</span></span><br><span class="line">  <span class="comment"># 加锁是因为训练时可能采用多线程加载数据</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">next</span><span class="params">(self)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> self.lock:</span><br><span class="line">      index_array = next(self.index_generator)</span><br><span class="line">    <span class="comment"># The transformation of images is not under thread lock</span></span><br><span class="line">    <span class="comment"># so it can be done in parallel</span></span><br><span class="line">    <span class="keyword">return</span> self._get_batches_of_transformed_samples(index_array)</span><br></pre></td></tr></table></figure>
-<p>至此，keras的<code>ImageDataGenerator</code>的工作原理基本分析完了；总结一下</p>
-<ul>
-<li>实现一个迭代器在线生成数据</li>
-<li>需要统计样本的数量，对应的类别信息</li>
-<li>记录batch索引信息</li>
-<li>处理一些特殊情况，如非整数个batch，样本是否都有效等</li>
-</ul>
-
-          
+          <p>Keras提供了一套很方便的在线读取、处理数据集的方法。对于Image Classification只要按照一定的结构组织图像数据集就能使用<code>ImageDataGenerator</code>这个类来在线读取训练、验证集数据，再配合<code>fit_generator</code>能够很方便的完成模型的训练和验证。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/08/25/keras_data_generator/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
@@ -526,7 +530,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-08-13 05:22:26" itemprop="dateModified" datetime="2018-08-13T05:22:26+00:00">2018-08-13</time>
+                <time title="Modified: 2018-08-26 09:18:43" itemprop="dateModified" datetime="2018-08-26T09:18:43+00:00">2018-08-26</time>
               
             
           </span>
@@ -578,31 +582,19 @@
 
       
         
-          
-            <!-- Vim是绕不过去的一门技能。很多公司都是PC+服务器的开发模式，命令行下的编辑器 -->
+          <!-- Vim是绕不过去的一门技能。很多公司都是PC+服务器的开发模式，命令行下的编辑器 -->
 <h3 id="vim的几种模式"><a href="#vim的几种模式" class="headerlink" title="vim的几种模式"></a>vim的几种模式</h3><ul>
 <li>正常模式</li>
 <li>插入模式</li>
 <li>命令模式</li>
-<li>可视模式</li>
-</ul>
-<h3 id="模式的切换"><a href="#模式的切换" class="headerlink" title="模式的切换"></a>模式的切换</h3><ul>
-<li>其它三种模式-&gt;正常模式：按<code>&lt;ESC&gt;</code>，一次不行就两次</li>
-<li>正常模式-&gt;插入模式：按<code>i</code>，有一些键能够执行一定的功能并进入插入模式，这里暂不展开</li>
-<li>正常模式-&gt;命令模式：按<code>:</code></li>
-<li>正常模式-&gt;可视模式：按<code>v</code></li>
-</ul>
-<h2 id="增删查改"><a href="#增删查改" class="headerlink" title="增删查改"></a>增删查改</h2><h3 id="编辑文本或代码"><a href="#编辑文本或代码" class="headerlink" title="编辑文本或代码"></a>编辑文本或代码</h3><p>命令行下<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim hello.cpp</span><br></pre></td></tr></table></figure></p>
-<p>将会启动vim，此时vim处于正常模式下，按<code>i</code>进入插入模式，就可以输入代码…是不是觉得贼难用？因为我们没有对vim进行任何配置，下面介绍一些基本的设置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># 注意标识，很明显是在命令模式下的操作</span><br><span class="line">:set nu         # 显示行号</span><br><span class="line">:set ts=4       # tab为4个字符宽</span><br><span class="line">:set shiftwidth # 自动对齐空格数</span><br><span class="line">:set autoindent # 自动对齐</span><br><span class="line">:set cursorline # 突出显示当前行</span><br><span class="line">:set ignorecase # 搜索时忽略大小写</span><br><span class="line">:set expandtab  # tab自动转空格</span><br><span class="line">... ...</span><br></pre></td></tr></table></figure></p>
-<p>现在用起来就方便多了，然而上述设置都是临时的，退出vim后就没了，可以通过添加配置文件来保存设置，在<code>~</code>目录下新建配置文件，将上述命令写到里面就行了（冒号不要写）。更多配置选项在网上查或查看帮助文档<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim ~/.vimrc</span><br></pre></td></tr></table></figure></p>
-<p>至此，可以用vim进行基本的代码编辑了。另外还有关于文件的保存及退出<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 记得先按&lt;Esc&gt;退出插入模式</span><br><span class="line">:q              # 退出vim</span><br><span class="line">:q!             # 强制退出，不保存</span><br><span class="line">:w              # 保存</span><br><span class="line">:wq             # 保存并退出</span><br><span class="line">:w &lt;filename&gt;   # 另存为</span><br></pre></td></tr></table></figure></p>
-<h3 id="快速删除"><a href="#快速删除" class="headerlink" title="快速删除"></a>快速删除</h3><p>在正常模式下，一些按键的组合能够快速删除文本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">dd              # 删除当前行</span><br><span class="line">dj              # 删除当前行和下一行</span><br><span class="line">dk              # 删除当前行和上一行</span><br><span class="line">dG              # 删除从当前行到文件结尾</span><br><span class="line">dgg             # 删除从当前行到文件开头</span><br><span class="line"># 还可以配合数字完成多行删除功能</span><br><span class="line">d3j             # 删除当前行和下三行</span><br></pre></td></tr></table></figure></p>
-<h3 id="撤销和恢复"><a href="#撤销和恢复" class="headerlink" title="撤销和恢复"></a>撤销和恢复</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">u               # 撤销最后一次修改（相当于ctrl+z）</span><br><span class="line">&lt;ctrl+r&gt;        # 恢复撤销的内容</span><br></pre></td></tr></table></figure>
-<h3 id="查"><a href="#查" class="headerlink" title="查"></a>查</h3><p>这里我将查分为查看和查找，查看涉及光标的快速移动和定位，查找则是对感兴趣内容的快速定位。</p>
-<p>首先是基本的光标移动：方向键或<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">h               # 前</span><br><span class="line">j               # 下</span><br><span class="line">k               # 上</span><br><span class="line">l               # 后</span><br><span class="line"># 高级点的</span><br><span class="line">3h              # 向前移动三个字符，类推</span><br><span class="line">o               # 移动到行首；&lt;Home&gt;&lt;End&gt;键也可以</span><br><span class="line">gg              # 移动到文件开头；&lt;ctrl+Home&gt;</span><br><span class="line">G               # 移动到文件最后一行；&lt;ctrl+End&gt;</span><br><span class="line">&lt;n&gt;G            # 跳到指定行，&lt;n&gt;表示行号，如3G表示跳到第三行</span><br><span class="line">:&lt;n&gt;            # 同上跳到某一行，是使用命令模式的方法</span><br><span class="line"># 定位各种括号，如(),[],&#123;&#125;；当光标在括号上时，按下`%`光标将跳到另一半括号上</span><br><span class="line">%</span><br><span class="line">################</span><br><span class="line"># 查找内容，如下，按n查找下一个，N查找上一个</span><br><span class="line">/&lt;word&gt;         # 向后查找</span><br><span class="line">?&lt;word&gt;         # 向前查找</span><br><span class="line"># 替换，替换就有点麻烦了</span><br><span class="line">:%s/&lt;old&gt;/&lt;new&gt;/gc      # 替换前询问</span><br><span class="line"># 一个例子</span><br><span class="line">:5,13s/&lt;old&gt;/&lt;new&gt;/g    # 替换第5-13行之间的关键词</span><br></pre></td></tr></table></figure></p>
-<h3 id="改"><a href="#改" class="headerlink" title="改"></a>改</h3><p>这里介绍复制、粘贴等操作<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 复制</span><br><span class="line">yy              # 复制当前行</span><br><span class="line"><span class="number">3</span>yy             # 复制<span class="number">3</span>行</span><br><span class="line"><span class="keyword">y</span>$              # 复制从光标到行尾所有字符</span><br><span class="line">yG              # 复制当前行到文件结尾</span><br><span class="line"># 粘贴</span><br><span class="line"><span class="keyword">p</span>               # 粘贴到光标之后</span><br><span class="line"><span class="keyword">P</span>               # 粘贴到光标之前</span><br></pre></td></tr></table></figure></p>
-
-          
+<li>可视模式
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/08/12/vim_usage/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
         
       
     </div>
